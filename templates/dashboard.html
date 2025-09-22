@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CSV Form Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <div class="intro">
+    <h1>CSV Form Validation Dashboard</h1>
+    <p>This web app helps you collect, validate, and audit form submissions in real time.</p>
+
+    <ul>
+      <li><strong>Manual Entry</strong> (left): Enter name, email, and phone manually. Each submission is immediately added to the table and validated. The result (VALID / INVALID) is logged with a timestamp.</li>
+      <li><strong>CSV Data</strong> (center): Displays all records from the <code>data.csv</code> file as a structured table.</li>
+      <li><strong>Audit Log</strong> (right): Shows the validation status (VALID / INVALID) for every row, including both manual entries and file-based records.</li>
+      <li><strong>Run Form Filler</strong>: Clicking this button checks all entries in <code>data.csv</code> and logs their validation results in bulk. Useful for batch auditing existing data.</li>
+    </ul>
+
+    <p>All actions are timestamped and recorded to ensure traceability and accuracy.</p>
+  </div>
+
+  <div class="container">
+
+    <div class="column">
+      <h2>Manual Entry</h2>
+      <form action="/" method="POST" class="form">
+        <input type="text" name="name" placeholder="Full Name" required />
+        <input type="email" name="email" placeholder="Email Address" required />
+        <input type="text" name="phone" placeholder="Phone Number" required />
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <div class="column">
+      <h2>CSV Data</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            {% for header in headers %}
+              <th>{{ header }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              {% for col in row %}
+                <td>{{ col }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="column audit-log-column">
+      <h2>Audit Log</h2>
+      <form method="POST" action="/run-filler">
+        <button type="submit">Run Form Filler</button>
+      </form>
+
+      <pre class="log-wrapper">
+{% for line in logs %}
+<span class="{{ 'pass-line' if line.startswith('VALID') else 'fail-line' }}">{{ line }}</span>
+{% endfor %}
+      </pre>
+    </div>
+
+  </div>
+</body>
+</html>
